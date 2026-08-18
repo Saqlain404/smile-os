@@ -64,7 +64,7 @@ export function CalendarView() {
         console.error("Failed to load events:", err);
       }
     },
-    [selectedDoctor]
+    [selectedDoctor],
   );
 
   useEffect(() => {
@@ -84,7 +84,7 @@ export function CalendarView() {
       await moveAppointment(info.event.id, date, startTime, endTime);
       loadEvents(
         calendarRef.current?.getApi().view.activeStart.toISOString() ?? "",
-        calendarRef.current?.getApi().view.activeEnd.toISOString() ?? ""
+        calendarRef.current?.getApi().view.activeEnd.toISOString() ?? "",
       );
     } catch (err) {
       info.revert();
@@ -92,7 +92,9 @@ export function CalendarView() {
     }
   };
 
-  const calendarRef = useRef<{ getApi: () => { view: { activeStart: Date; activeEnd: Date } } } | null>(null);
+  const calendarRef = useRef<{
+    getApi: () => { view: { activeStart: Date; activeEnd: Date } };
+  } | null>(null);
 
   const handleDateClick = (info: { dateStr: string; date: Date }) => {
     setSelectedDate(info.dateStr);
@@ -100,7 +102,10 @@ export function CalendarView() {
     setFormOpen(true);
   };
 
-  const handleEventClick = async (info: { event: { id: string; extendedProps: Record<string, unknown> }; jsEvent: MouseEvent }) => {
+  const handleEventClick = async (info: {
+    event: { id: string; extendedProps: Record<string, unknown> };
+    jsEvent: MouseEvent;
+  }) => {
     info.jsEvent.preventDefault();
     const status = info.event.extendedProps.status as string;
     // Simple status cycle on click
@@ -113,7 +118,7 @@ export function CalendarView() {
       await updateAppointmentStatus(info.event.id, statusFlow[status]);
       loadEvents(
         calendarRef.current?.getApi().view.activeStart.toISOString() ?? "",
-        calendarRef.current?.getApi().view.activeEnd.toISOString() ?? ""
+        calendarRef.current?.getApi().view.activeEnd.toISOString() ?? "",
       );
     }
   };
@@ -125,7 +130,12 @@ export function CalendarView() {
         description="Visual appointment calendar with drag & drop."
         actions={
           <div className="flex items-center gap-3">
-            <Select value={selectedDoctor} onValueChange={(v) => { setSelectedDoctor(v ?? "all"); }}>
+            <Select
+              value={selectedDoctor}
+              onValueChange={(v) => {
+                setSelectedDoctor(v ?? "all");
+              }}
+            >
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="All Doctors" />
               </SelectTrigger>
@@ -154,20 +164,29 @@ export function CalendarView() {
 
       {/* Legend */}
       <div className="flex flex-wrap gap-3">
-        {Object.entries(APPOINTMENT_STATUS_COLORS).map(([status, colorClass]) => (
-          <div key={status} className="flex items-center gap-2">
-            <div className={`h-3 w-3 rounded-full ${colorClass.includes("bg-") ? colorClass.split(" ")[0].replace("/10", "").replace("/20", "") : "bg-gray-400"}`} />
-            <span className="text-xs text-muted-foreground">
-              {status.replace("_", " ")}
-            </span>
-          </div>
-        ))}
+        {Object.entries(APPOINTMENT_STATUS_COLORS).map(
+          ([status, colorClass]) => (
+            <div key={status} className="flex items-center gap-2">
+              <div
+                className={`h-3 w-3 rounded-full ${colorClass.includes("bg-") ? colorClass.split(" ")[0].replace("/10", "").replace("/20", "") : "bg-gray-400"}`}
+              />
+              <span className="text-xs text-muted-foreground">
+                {status.replace("_", " ")}
+              </span>
+            </div>
+          ),
+        )}
       </div>
 
       {/* Calendar */}
       <div className="rounded-xl border bg-card p-4">
         <FullCalendar
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin, listPlugin]}
+          plugins={[
+            dayGridPlugin,
+            timeGridPlugin,
+            interactionPlugin,
+            listPlugin,
+          ]}
           initialView="timeGridWeek"
           headerToolbar={{
             left: "prev,next today",
@@ -190,15 +209,36 @@ export function CalendarView() {
           dateClick={handleDateClick}
           eventClick={handleEventClick}
           datesSet={(dateInfo: { start: Date; end: Date }) => {
-            loadEvents(dateInfo.start.toISOString(), dateInfo.end.toISOString());
+            loadEvents(
+              dateInfo.start.toISOString(),
+              dateInfo.end.toISOString(),
+            );
           }}
-          eventContent={(arg: { event: { title: string; extendedProps: Record<string, unknown> } }) => (
+          eventContent={(arg: {
+            event: { title: string; extendedProps: Record<string, unknown> };
+          }) => (
             <div className="px-1 py-0.5 text-xs overflow-hidden cursor-pointer">
               <p className="font-medium truncate">{arg.event.title}</p>
-              {(arg.event.extendedProps as { patient: { firstName: string; lastName: string } }).patient && (
+              {(
+                arg.event.extendedProps as {
+                  patient: { firstName: string; lastName: string };
+                }
+              ).patient && (
                 <p className="opacity-75 truncate">
-                  {(arg.event.extendedProps as { patient: { firstName: string; lastName: string } }).patient.firstName}{" "}
-                  {(arg.event.extendedProps as { patient: { firstName: string; lastName: string } }).patient.lastName}
+                  {
+                    (
+                      arg.event.extendedProps as {
+                        patient: { firstName: string; lastName: string };
+                      }
+                    ).patient.firstName
+                  }{" "}
+                  {
+                    (
+                      arg.event.extendedProps as {
+                        patient: { firstName: string; lastName: string };
+                      }
+                    ).patient.lastName
+                  }
                 </p>
               )}
             </div>
@@ -216,7 +256,7 @@ export function CalendarView() {
           setFormOpen(false);
           loadEvents(
             calendarRef.current?.getApi().view.activeStart.toISOString() ?? "",
-            calendarRef.current?.getApi().view.activeEnd.toISOString() ?? ""
+            calendarRef.current?.getApi().view.activeEnd.toISOString() ?? "",
           );
         }}
       />

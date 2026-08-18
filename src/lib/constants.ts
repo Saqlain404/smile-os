@@ -89,6 +89,22 @@ export const PAYMENT_STATUS_COLORS: Record<string, string> = {
   CANCELLED: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
 };
 
+export const NOTIFICATION_TYPE_COLORS: Record<string, string> = {
+  EMAIL: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+  SMS: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+  WHATSAPP: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400",
+  PUSH: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
+  IN_APP: "bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400",
+};
+
+export const NOTIFICATION_STATUS_COLORS: Record<string, string> = {
+  UNREAD:
+    "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
+  READ: "bg-gray-100 text-gray-800 dark:bg-gray-800/30 dark:text-gray-400",
+  ARCHIVED:
+    "bg-muted text-muted-foreground",
+};
+
 export const TIME_SLOTS = Array.from({ length: 48 }, (_, i) => {
   const hours = Math.floor(i / 2);
   const minutes = i % 2 === 0 ? "00" : "30";
