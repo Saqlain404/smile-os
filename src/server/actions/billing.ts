@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 "use server";
 
 import prisma from "@/lib/prisma";

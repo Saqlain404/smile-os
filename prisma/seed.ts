@@ -1,12 +1,13 @@
-import { PrismaClient } from "../src/generated/prisma";
+import { PrismaClient } from "../src/generated/prisma/client.js";
+import { PrismaPg } from "@prisma/adapter-pg";
 import { createId } from "@paralleldrive/cuid2";
+import { hashPassword } from "@better-auth/utils/password";
+import "dotenv/config";
 
-const prisma = new PrismaClient();
-
-async function hashPassword(password: string): Promise<string> {
-  const { createHash } = await import("crypto");
-  return createHash("sha256").update(password).digest("hex");
-}
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!,
+});
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log("Seeding database...");

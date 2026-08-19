@@ -18,6 +18,8 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
+  Sparkles,
+  Brain,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSession, signOut } from "@/lib/auth-client";
@@ -41,6 +43,8 @@ const iconMap = {
   UserCog,
   Bell,
   Settings,
+  Sparkles,
+  Brain,
 } as const;
 
 interface NavGroup {
@@ -70,6 +74,10 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
+    label: "Intelligence",
+    items: [{ label: "AI Assistant", href: "/ai", icon: "Sparkles" }],
+  },
+  {
     label: "Administration",
     items: [
       { label: "Staff", href: "/staff", icon: "UserCog" },
@@ -95,7 +103,7 @@ export function Sidebar() {
         {/* Logo */}
         <div className="flex h-16 items-center gap-3 px-4">
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground font-bold text-sm">
-            S
+            <Sparkles className="h-4 w-4" />
           </div>
           <AnimatePresence>
             {!collapsed && (

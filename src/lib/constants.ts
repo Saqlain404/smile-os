@@ -44,6 +44,13 @@ export const NAV_ITEMS = {
       icon: "CreditCard",
     },
   ],
+  intelligence: [
+    {
+      label: "AI Assistant",
+      href: "/ai",
+      icon: "Sparkles",
+    },
+  ],
   administration: [
     {
       label: "Staff",

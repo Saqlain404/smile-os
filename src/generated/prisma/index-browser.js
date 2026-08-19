@@ -526,6 +526,37 @@ exports.Prisma.GalleryImageScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.AIConversationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AIMessageScalarFieldEnum = {
+  id: 'id',
+  conversationId: 'conversationId',
+  role: 'role',
+  content: 'content',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.AIInsightScalarFieldEnum = {
+  id: 'id',
+  clinicId: 'clinicId',
+  type: 'type',
+  severity: 'severity',
+  title: 'title',
+  description: 'description',
+  entityId: 'entityId',
+  entityType: 'entityType',
+  metadata: 'metadata',
+  isRead: 'isRead',
+  isDismissed: 'isDismissed',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.ActivityLogScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -643,6 +674,22 @@ exports.NotificationStatus = exports.$Enums.NotificationStatus = {
   ARCHIVED: 'ARCHIVED'
 };
 
+exports.AIInsightType = exports.$Enums.AIInsightType = {
+  DIAGNOSIS: 'DIAGNOSIS',
+  TREATMENT: 'TREATMENT',
+  RISK: 'RISK',
+  PREDICTION: 'PREDICTION',
+  OPTIMIZATION: 'OPTIMIZATION',
+  REVENUE: 'REVENUE'
+};
+
+exports.AIInsightSeverity = exports.$Enums.AIInsightSeverity = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+  CRITICAL: 'CRITICAL'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Session: 'Session',
@@ -674,6 +721,9 @@ exports.Prisma.ModelName = {
   Review: 'Review',
   BlogPost: 'BlogPost',
   GalleryImage: 'GalleryImage',
+  AIConversation: 'AIConversation',
+  AIMessage: 'AIMessage',
+  AIInsight: 'AIInsight',
   ActivityLog: 'ActivityLog',
   AuditLog: 'AuditLog'
 };
