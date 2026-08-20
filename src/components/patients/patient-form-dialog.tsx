@@ -96,7 +96,6 @@ export function PatientFormDialog({
       }
       onSuccess();
     } catch (error) {
-      console.error("Failed to save patient:", error);
     }
   };
 

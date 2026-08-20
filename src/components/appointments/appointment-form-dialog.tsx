@@ -22,10 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  appointmentSchema,
-  type AppointmentFormData,
-} from "@/lib/validations";
+import { appointmentSchema, type AppointmentFormData } from "@/lib/validations";
 import {
   createAppointment,
   updateAppointment,
@@ -112,6 +109,7 @@ export function AppointmentFormDialog({
     },
   });
 
+  const watchPatientId = watch("patientId");
   const watchDoctorId = watch("doctorId");
   const watchTreatmentId = watch("treatmentId");
   const watchStartTime = watch("startTime");
@@ -136,7 +134,7 @@ export function AppointmentFormDialog({
         setPatients(patientResult.data as Patient[]);
         setChairs(chairResult as Chair[]);
       } catch (err) {
-        console.error("Failed to load form data:", err);
+        // silent
       }
     }
     if (open) loadData();
@@ -149,7 +147,7 @@ export function AppointmentFormDialog({
         const data = raw.map((t) => ({ ...t, price: Number(t.price) }));
         setTreatments(data as Treatment[]);
       } catch (err) {
-        console.error("Failed to load treatments:", err);
+        // silent
       }
     }
     if (open) loadTreatments();
@@ -181,7 +179,8 @@ export function AppointmentFormDialog({
         endTime: appointment.endTime as string,
         duration: appointment.duration as number,
         notes: (appointment.notes as string) ?? "",
-        status: ((appointment.status as string) ?? "BOOKED") as AppointmentFormData["status"],
+        status: ((appointment.status as string) ??
+          "BOOKED") as AppointmentFormData["status"],
         isRecurring: false,
       });
     } else {
@@ -207,13 +206,18 @@ export function AppointmentFormDialog({
     setError("");
     try {
       if (appointment) {
-        await updateAppointment(appointment.id as string, data as Partial<AppointmentFormData>);
+        await updateAppointment(
+          appointment.id as string,
+          data as Partial<AppointmentFormData>,
+        );
       } else {
         await createAppointment(data as AppointmentFormData);
       }
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save appointment");
+      setError(
+        err instanceof Error ? err.message : "Failed to save appointment",
+      );
     }
   };
 
@@ -225,6 +229,9 @@ export function AppointmentFormDialog({
       p.phone.includes(search)
     );
   });
+
+  const selectedPatient = patients.find((p) => p.id === watchPatientId);
+  const selectedDoctor = doctors.find((d) => d.id === watchDoctorId);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -255,7 +262,13 @@ export function AppointmentFormDialog({
                   onValueChange={(v) => v && setValue("patientId", v)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select patient" />
+                    <SelectValue>
+                      {() =>
+                        selectedPatient
+                          ? `${selectedPatient.firstName} ${selectedPatient.lastName}`
+                          : "Select patient"
+                      }
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {filteredPatients.map((p) => (
@@ -273,7 +286,13 @@ export function AppointmentFormDialog({
                   onValueChange={(v) => v && setValue("doctorId", v)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select doctor" />
+                    <SelectValue>
+                      {() =>
+                        selectedDoctor
+                          ? `${selectedDoctor.user.name}${selectedDoctor.department ? ` (${selectedDoctor.department.name})` : ""}`
+                          : "Select doctor"
+                      }
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {doctors.map((d) => (
@@ -305,7 +324,16 @@ export function AppointmentFormDialog({
                   onValueChange={(v) => v && setValue("treatmentId", v)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select treatment" />
+                    <SelectValue>
+                      {() => {
+                        const selectedTreatment = treatments.find(
+                          (t) => t.id === watch("treatmentId"),
+                        );
+                        return selectedTreatment
+                          ? `${selectedTreatment.name} (${selectedTreatment.price})`
+                          : "Select treatment";
+                      }}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {treatments.map((t) => (
@@ -323,7 +351,16 @@ export function AppointmentFormDialog({
                   onValueChange={(v) => v && setValue("chairId", v)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select chair" />
+                    <SelectValue>
+                      {() => {
+                        const selectedChair = chairs.find(
+                          (c) => c.id === watch("chairId"),
+                        );
+                        return selectedChair
+                          ? selectedChair.name
+                          : "Select chair";
+                      }}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {chairs.map((c) => (
@@ -344,7 +381,11 @@ export function AppointmentFormDialog({
             </h4>
             <div className="space-y-2">
               <Label htmlFor="title">Title *</Label>
-              <Input id="title" {...register("title")} placeholder="Appointment title" />
+              <Input
+                id="title"
+                {...register("title")}
+                placeholder="Appointment title"
+              />
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
@@ -393,11 +434,20 @@ export function AppointmentFormDialog({
           {/* Notes */}
           <div className="space-y-2">
             <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" {...register("notes")} rows={2} placeholder="Additional notes..." />
+            <Textarea
+              id="notes"
+              {...register("notes")}
+              rows={2}
+              placeholder="Additional notes..."
+            />
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting}>

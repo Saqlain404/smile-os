@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSession } from "@/lib/auth-client";
+import { useSession, signOut } from "@/lib/auth-client";
 import { NotificationCenter } from "@/components/notifications/notification-center";
 
 export function Topbar() {
@@ -100,7 +100,10 @@ export function Topbar() {
             </DropdownMenuItem>
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem
+              className="text-destructive"
+              onClick={() => signOut({ fetchOptions: { onSuccess: () => router.push("/login") } })}
+            >
               Sign Out
             </DropdownMenuItem>
           </DropdownMenuContent>

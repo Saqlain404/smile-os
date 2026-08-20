@@ -28,7 +28,7 @@ export default function LoginPage() {
     });
 
     if (result.error) {
-      setError("Invalid email or password");
+      setError(result.error.message ?? "Invalid email or password");
       setLoading(false);
       return;
     }

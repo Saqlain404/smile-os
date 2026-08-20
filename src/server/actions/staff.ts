@@ -1,5 +1,6 @@
 "use server";
 
+import { requireSession } from "@/lib/auth-server";
 import prisma from "@/lib/prisma";
 
 // ─── Staff CRUD ────────────────────────────────────────────────────
@@ -12,6 +13,7 @@ export async function getStaff(params: {
   page?: number;
   pageSize?: number;
 }) {
+  await requireSession();
   const { search, role, departmentId, isActive, page = 1, pageSize = 20 } = params;
   const skip = (page - 1) * pageSize;
 
@@ -57,6 +59,7 @@ export async function getStaff(params: {
 }
 
 export async function getStaffMember(id: string) {
+  await requireSession();
   return prisma.staff.findUnique({
     where: { id },
     include: {
@@ -96,6 +99,7 @@ export async function createStaff(data: {
   bio?: string;
   salary?: number;
 }) {
+  await requireSession();
   // Check email uniqueness
   const existing = await prisma.user.findUnique({ where: { email: data.email } });
   if (existing) throw new Error("A user with this email already exists");
@@ -155,13 +159,13 @@ export async function updateStaff(
     isActive?: boolean;
   }
 ) {
+  await requireSession();
   const staff = await prisma.staff.findUnique({
     where: { id },
-    include: { user: true },
+    include: { user: { select: { name: true, email: true, role: true } } },
   });
   if (!staff) throw new Error("Staff member not found");
 
-  // Update user record if name or role changed
   const userData: Record<string, unknown> = {};
   if (data.firstName || data.lastName) {
     userData.name = `${data.firstName ?? staff.user.name.split(" ")[0]} ${data.lastName ?? staff.user.name.split(" ").slice(1).join(" ")}`;
@@ -194,6 +198,7 @@ export async function updateStaff(
 }
 
 export async function deleteStaff(id: string) {
+  await requireSession();
   const staff = await prisma.staff.findUnique({ where: { id } });
   if (!staff) throw new Error("Staff member not found");
 
@@ -206,6 +211,7 @@ export async function deleteStaff(id: string) {
 // ─── Departments ───────────────────────────────────────────────────
 
 export async function getDepartments() {
+  await requireSession();
   const clinic = await prisma.clinic.findFirst();
   if (!clinic) return [];
 
@@ -223,6 +229,7 @@ export async function createDepartment(data: {
   description?: string;
   color?: string;
 }) {
+  await requireSession();
   const clinic = await prisma.clinic.findFirst();
   if (!clinic) throw new Error("No clinic found");
 
@@ -240,10 +247,12 @@ export async function updateDepartment(
   id: string,
   data: { name?: string; description?: string; color?: string; isActive?: boolean }
 ) {
+  await requireSession();
   return prisma.department.update({ where: { id }, data });
 }
 
 export async function deleteDepartment(id: string) {
+  await requireSession();
   const staffCount = await prisma.staff.count({ where: { departmentId: id } });
   if (staffCount > 0) {
     throw new Error(
@@ -256,6 +265,7 @@ export async function deleteDepartment(id: string) {
 // ─── Stats ─────────────────────────────────────────────────────────
 
 export async function getStaffStats() {
+  await requireSession();
   const clinic = await prisma.clinic.findFirst();
   if (!clinic) {
     return { total: 0, active: 0, byRole: {}, byDepartment: [], onLeave: 0, inactiveCount: 0 };

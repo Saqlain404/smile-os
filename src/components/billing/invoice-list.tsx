@@ -45,7 +45,6 @@ export function InvoiceList() {
       setInvoices(result.data as unknown as InvoiceRow[]);
       setPagination(result.pagination);
     } catch (err) {
-      console.error("Failed to load invoices:", err);
     } finally {
       setLoading(false);
     }

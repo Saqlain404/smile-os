@@ -1,5 +1,6 @@
 "use server";
 
+import { requireSession } from "@/lib/auth-server";
 import prisma from "@/lib/prisma";
 
 // ─── Notifications CRUD ────────────────────────────────────────────
@@ -12,6 +13,7 @@ export async function getNotifications(params: {
   page?: number;
   pageSize?: number;
 }) {
+  await requireSession();
   const { userId, search, type, status, page = 1, pageSize = 20 } = params;
   const skip = (page - 1) * pageSize;
 
@@ -43,12 +45,14 @@ export async function getNotifications(params: {
 }
 
 export async function getUnreadCount(userId: string) {
+  await requireSession();
   return prisma.notification.count({
     where: { userId, status: "UNREAD" },
   });
 }
 
 export async function getRecentNotifications(userId: string, limit = 8) {
+  await requireSession();
   return prisma.notification.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },
@@ -57,6 +61,7 @@ export async function getRecentNotifications(userId: string, limit = 8) {
 }
 
 export async function markAsRead(id: string) {
+  await requireSession();
   return prisma.notification.update({
     where: { id },
     data: { status: "READ" },
@@ -64,6 +69,7 @@ export async function markAsRead(id: string) {
 }
 
 export async function markAllAsRead(userId: string) {
+  await requireSession();
   return prisma.notification.updateMany({
     where: { userId, status: "UNREAD" },
     data: { status: "READ" },
@@ -71,6 +77,7 @@ export async function markAllAsRead(userId: string) {
 }
 
 export async function archiveNotification(id: string) {
+  await requireSession();
   return prisma.notification.update({
     where: { id },
     data: { status: "ARCHIVED" },
@@ -78,6 +85,7 @@ export async function archiveNotification(id: string) {
 }
 
 export async function deleteNotification(id: string) {
+  await requireSession();
   return prisma.notification.delete({ where: { id } });
 }
 
@@ -89,6 +97,7 @@ export async function createNotification(data: {
   link?: string;
   metadata?: Record<string, unknown>;
 }) {
+  await requireSession();
   return prisma.notification.create({
     data: {
       userId: data.userId,
@@ -104,6 +113,7 @@ export async function createNotification(data: {
 // ─── Notification Stats ────────────────────────────────────────────
 
 export async function getNotificationStats(userId: string) {
+  await requireSession();
   const [total, unread, archived] = await Promise.all([
     prisma.notification.count({ where: { userId } }),
     prisma.notification.count({ where: { userId, status: "UNREAD" } }),

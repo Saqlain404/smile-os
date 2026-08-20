@@ -90,7 +90,6 @@ export function StaffFormDialog({
         const data = await getDepartments();
         setDepartments(data as Department[]);
       } catch (err) {
-        console.error("Failed to load departments:", err);
       }
     }
     if (open) loadDepts();

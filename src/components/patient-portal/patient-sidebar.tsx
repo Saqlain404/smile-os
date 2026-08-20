@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -31,6 +31,7 @@ const navItems = [
 export function PatientSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
 
   return (
@@ -129,7 +130,7 @@ export function PatientSidebar() {
         )}
 
         <button
-          onClick={() => signOut()}
+          onClick={() => signOut({ fetchOptions: { onSuccess: () => router.push("/login") } })}
           className={cn(
             "flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:text-destructive transition-colors",
             collapsed && "justify-center px-0"

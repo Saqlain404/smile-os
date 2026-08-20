@@ -1,5 +1,6 @@
 "use server";
 
+import { requireSession } from "@/lib/auth-server";
 import prisma from "@/lib/prisma";
 
 export async function getAppointments(params: {
@@ -10,6 +11,7 @@ export async function getAppointments(params: {
   page?: number;
   pageSize?: number;
 }) {
+  await requireSession();
   const { start, end, doctorId, status, page = 1, pageSize = 50 } = params;
   const skip = (page - 1) * pageSize;
 
@@ -71,6 +73,7 @@ export async function getAppointments(params: {
 }
 
 export async function getCalendarAppointments(start: string, end: string, doctorId?: string) {
+  await requireSession();
   const where: Record<string, unknown> = {
     date: { gte: new Date(start), lte: new Date(end) },
   };
@@ -118,6 +121,7 @@ function getAptColor(status: string, treatmentColor?: string | null): string {
 }
 
 export async function getAppointment(id: string) {
+  await requireSession();
   return prisma.appointment.findUnique({
     where: { id },
     include: {
@@ -152,6 +156,7 @@ export async function createAppointment(data: {
   duration: number;
   notes?: string;
 }) {
+  await requireSession();
   const clinic = await prisma.clinic.findFirst();
   if (!clinic) throw new Error("No clinic found");
 
@@ -228,6 +233,7 @@ export async function updateAppointment(
     status: string;
   }>
 ) {
+  await requireSession();
   const updateData: Record<string, unknown> = { ...data };
   if (data.date) updateData.date = new Date(data.date);
 
@@ -238,6 +244,7 @@ export async function updateAppointment(
 }
 
 export async function updateAppointmentStatus(id: string, status: string) {
+  await requireSession();
   const now = new Date();
   const updateData: Record<string, unknown> = { status };
 
@@ -252,6 +259,7 @@ export async function updateAppointmentStatus(id: string, status: string) {
 }
 
 export async function moveAppointment(id: string, date: string, startTime: string, endTime: string) {
+  await requireSession();
   return prisma.appointment.update({
     where: { id },
     data: {
@@ -263,10 +271,12 @@ export async function moveAppointment(id: string, date: string, startTime: strin
 }
 
 export async function deleteAppointment(id: string) {
+  await requireSession();
   await prisma.appointment.delete({ where: { id } });
 }
 
 export async function getDoctors() {
+  await requireSession();
   return prisma.staff.findMany({
     where: { isActive: true },
     include: {
@@ -277,6 +287,7 @@ export async function getDoctors() {
 }
 
 export async function getChairs() {
+  await requireSession();
   const clinic = await prisma.clinic.findFirst();
   if (!clinic) return [];
   return prisma.chair.findMany({
@@ -285,6 +296,7 @@ export async function getChairs() {
 }
 
 export async function getTreatments() {
+  await requireSession();
   const clinic = await prisma.clinic.findFirst();
   if (!clinic) return [];
   return prisma.treatment.findMany({

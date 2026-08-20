@@ -179,7 +179,6 @@ export function PatientDetail({ patientId }: { patientId: string }) {
         const data = await getPatient(patientId);
         setPatient(data as unknown as PatientData);
       } catch (error) {
-        console.error("Failed to load patient:", error);
       } finally {
         setLoading(false);
       }

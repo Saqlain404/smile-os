@@ -56,7 +56,6 @@ export default function BillingPage() {
       setStats(statsData);
       setInvoices(invoiceData.data as unknown as RecentInvoice[]);
     } catch (err) {
-      console.error("Failed to load billing data:", err);
     } finally {
       setLoading(false);
     }

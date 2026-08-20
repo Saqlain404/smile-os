@@ -1,10 +1,15 @@
 "use server";
 
+import { requireSession } from "@/lib/auth-server";
 import prisma from "@/lib/prisma";
 
 // ─── Patient Portal Data ───────────────────────────────────────────
 
 export async function getPatientByUserId(userId: string) {
+  const session = await requireSession();
+  if (session.user.id !== userId) {
+    throw new Error("Forbidden: cannot access another user's data");
+  }
   return prisma.patient.findUnique({
     where: { userId },
     include: {
@@ -22,6 +27,7 @@ export async function getPatientAppointments(patientId: string, params?: {
   page?: number;
   pageSize?: number;
 }) {
+  await requireSession();
   const { status, page = 1, pageSize = 10 } = params ?? {};
   const skip = (page - 1) * pageSize;
 
@@ -70,6 +76,7 @@ export async function getPatientInvoices(patientId: string, params?: {
   page?: number;
   pageSize?: number;
 }) {
+  await requireSession();
   const { status, page = 1, pageSize = 10 } = params ?? {};
   const skip = (page - 1) * pageSize;
 
@@ -133,6 +140,7 @@ export async function getPatientInvoices(patientId: string, params?: {
 }
 
 export async function getPatientTreatments(patientId: string) {
+  await requireSession();
   const consultations = await prisma.consultation.findMany({
     where: { patientId },
     include: {
@@ -183,6 +191,7 @@ export async function getPatientTreatments(patientId: string) {
 }
 
 export async function getPatientStats(patientId: string) {
+  await requireSession();
   const [totalAppointments, upcomingAppointments, totalInvoices, unpaidInvoices, totalDocuments] =
     await Promise.all([
       prisma.appointment.count({ where: { patientId } }),

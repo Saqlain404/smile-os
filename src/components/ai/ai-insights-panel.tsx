@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Brain,
@@ -15,6 +15,7 @@ import {
   ChevronDown,
   ChevronUp,
   Lightbulb,
+  Loader2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,8 +26,7 @@ import {
   markInsightRead,
   dismissInsight,
 } from "@/server/actions/ai";
-import { useEffect } from "react";
-import { Loader2 } from "lucide-react";
+
 
 interface Insight {
   id: string;

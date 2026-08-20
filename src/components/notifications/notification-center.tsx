@@ -24,6 +24,7 @@ import {
   markAllAsRead,
   archiveNotification,
 } from "@/server/actions/notifications";
+import { useSession } from "@/lib/auth-client";
 import { formatDistanceToNow } from "date-fns";
 
 interface Notification {
@@ -50,12 +51,18 @@ export function NotificationCenter() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const { data: session } = useSession();
+  const userId = session?.user?.id ?? "";
 
   const fetchNotifications = async () => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
     try {
       const [notifs, count] = await Promise.all([
-        getRecentNotifications("current-user", 8),
-        getUnreadCount("current-user"),
+        getRecentNotifications(userId, 8),
+        getUnreadCount(userId),
       ]);
       setNotifications(notifs as Notification[]);
       setUnreadCount(count);
@@ -81,7 +88,7 @@ export function NotificationCenter() {
   };
 
   const handleMarkAllRead = async () => {
-    await markAllAsRead("current-user");
+    await markAllAsRead(userId);
     setNotifications((prev) =>
       prev.map((n) => ({ ...n, status: "READ" }))
     );

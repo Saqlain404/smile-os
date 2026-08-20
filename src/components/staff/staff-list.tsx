@@ -46,7 +46,6 @@ export function StaffList() {
       setStaff(result.data as unknown as StaffRow[]);
       setPagination(result.pagination);
     } catch (err) {
-      console.error("Failed to load staff:", err);
     } finally {
       setLoading(false);
     }

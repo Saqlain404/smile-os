@@ -7,9 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { PageHeader } from "@/components/layout/page-header";
+import { useSession } from "@/lib/auth-client";
 import { getPatientByUserId } from "@/server/actions/patient-portal";
-
-const DEMO_USER_ID = "current-user";
 
 interface ProfilePatient {
   id: string;
@@ -54,13 +53,16 @@ const item = {
 };
 
 export default function PatientProfilePage() {
+  const { data: session } = useSession();
+  const userId = session?.user?.id ?? "";
   const [patient, setPatient] = useState<ProfilePatient | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!userId) return;
     async function load() {
       try {
-        const data = await getPatientByUserId(DEMO_USER_ID);
+        const data = await getPatientByUserId(userId);
         if (data) setPatient(data as unknown as ProfilePatient);
       } catch {
         // empty
@@ -69,7 +71,7 @@ export default function PatientProfilePage() {
       }
     }
     load();
-  }, []);
+  }, [userId]);
 
   const firstName = patient?.firstName ?? "";
   const lastName = patient?.lastName ?? "";

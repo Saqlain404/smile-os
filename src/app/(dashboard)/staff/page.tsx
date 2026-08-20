@@ -51,7 +51,6 @@ export default function StaffPage() {
       const data = await getStaffStats();
       setStats(data as StaffStats);
     } catch (err) {
-      console.error("Failed to load stats:", err);
     }
   }, []);
 

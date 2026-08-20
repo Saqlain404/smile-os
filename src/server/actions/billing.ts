@@ -1,6 +1,6 @@
-/* eslint-disable prefer-const */
 "use server";
 
+import { requireSession } from "@/lib/auth-server";
 import prisma from "@/lib/prisma";
 
 // ─── Invoice CRUD ──────────────────────────────────────────────────
@@ -12,6 +12,7 @@ export async function getInvoices(params: {
   page?: number;
   pageSize?: number;
 }) {
+  await requireSession();
   const { search, status, patientId, page = 1, pageSize = 20 } = params;
   const skip = (page - 1) * pageSize;
 
@@ -54,6 +55,7 @@ export async function getInvoices(params: {
 }
 
 export async function getInvoice(id: string) {
+  await requireSession();
   return prisma.invoice.findUnique({
     where: { id },
     include: {
@@ -75,6 +77,7 @@ export async function createInvoice(data: {
   discount?: number;
   notes?: string;
 }) {
+  await requireSession();
   const clinic = await prisma.clinic.findFirst();
   if (!clinic) throw new Error("No clinic found");
 
@@ -122,6 +125,7 @@ export async function updateInvoice(
     items?: { description: string; quantity: number; unitPrice: number }[];
   }
 ) {
+  await requireSession();
   const existing = await prisma.invoice.findUnique({
     where: { id },
     include: { items: true, payments: true },
@@ -138,7 +142,7 @@ export async function updateInvoice(
   if (data.notes !== undefined) updateData.notes = data.notes;
 
   let subtotal = Number(existing.subtotal);
-  let discount = data.discount !== undefined ? data.discount : Number(existing.discount);
+  const discount = data.discount !== undefined ? data.discount : Number(existing.discount);
 
   if (data.items) {
     // Delete old items, create new ones
@@ -181,6 +185,7 @@ export async function updateInvoice(
 }
 
 export async function deleteInvoice(id: string) {
+  await requireSession();
   // Delete items and payments first (cascade should handle it, but be explicit)
   await prisma.invoiceItem.deleteMany({ where: { invoiceId: id } });
   await prisma.payment.deleteMany({ where: { invoiceId: id } });
@@ -196,6 +201,7 @@ export async function recordPayment(data: {
   reference?: string;
   notes?: string;
 }) {
+  await requireSession();
   const invoice = await prisma.invoice.findUnique({
     where: { id: data.invoiceId },
     include: { payments: true },
@@ -238,6 +244,7 @@ export async function recordPayment(data: {
 // ─── Stats ─────────────────────────────────────────────────────────
 
 export async function getBillingStats() {
+  await requireSession();
   const clinic = await prisma.clinic.findFirst();
   if (!clinic) {
     return {

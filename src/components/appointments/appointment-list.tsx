@@ -77,7 +77,7 @@ export function AppointmentList() {
       setAppointments(result.data as AppointmentRow[]);
       setPagination(result.pagination);
     } catch (error) {
-      console.error("Failed to fetch appointments:", error);
+      // silent
     } finally {
       setLoading(false);
     }

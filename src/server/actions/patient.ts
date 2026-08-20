@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma";
 import { patientSchema, type PatientFormData } from "@/lib/validations";
+import { requireSession } from "@/lib/auth-server";
 
 export async function getPatients(params: {
   search?: string;
@@ -12,6 +13,7 @@ export async function getPatients(params: {
   tag?: string;
   gender?: string;
 }) {
+  await requireSession();
   const {
     search = "",
     page = 1,
@@ -74,6 +76,7 @@ export async function getPatients(params: {
 }
 
 export async function getPatient(id: string) {
+  await requireSession();
   const patient = await prisma.patient.findUnique({
     where: { id },
     include: {
@@ -124,6 +127,7 @@ export async function getPatient(id: string) {
 }
 
 export async function createPatient(data: PatientFormData) {
+  await requireSession();
   const validated = patientSchema.parse(data);
 
   // Get first clinic (single-clinic mode for now)
@@ -161,6 +165,7 @@ export async function createPatient(data: PatientFormData) {
 }
 
 export async function updatePatient(id: string, data: PatientFormData) {
+  await requireSession();
   const validated = patientSchema.parse(data);
 
   const patient = await prisma.patient.update({
@@ -194,29 +199,34 @@ export async function updatePatient(id: string, data: PatientFormData) {
 }
 
 export async function deletePatient(id: string) {
+  await requireSession();
   await prisma.patient.delete({ where: { id } });
 }
 
 export async function addPatientTag(patientId: string, name: string, color: string) {
+  await requireSession();
   return prisma.patientTag.create({
     data: { patientId, name, color },
   });
 }
 
 export async function removePatientTag(id: string) {
+  await requireSession();
   await prisma.patientTag.delete({ where: { id } });
 }
 
 export async function addFamilyMember(
   patientId: string,
-  data: { name: string; relation: string; phone?: string; email?: string }
+  data: { name: string; relation: string; phone?: string;   email?: string }
 ) {
+  await requireSession();
   return prisma.familyMember.create({
     data: { patientId, ...data },
   });
 }
 
 export async function deleteFamilyMember(id: string) {
+  await requireSession();
   await prisma.familyMember.delete({ where: { id } });
 }
 
@@ -233,6 +243,7 @@ export async function upsertInsurance(
     expiryDate?: string;
   }
 ) {
+  await requireSession();
   return prisma.insurance.upsert({
     where: { patientId },
     create: {
@@ -256,6 +267,7 @@ export async function upsertInsurance(
 }
 
 export async function getPatientStats() {
+  await requireSession();
   const total = await prisma.patient.count();
   const thisMonth = await prisma.patient.count({
     where: {

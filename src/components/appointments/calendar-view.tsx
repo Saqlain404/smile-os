@@ -6,6 +6,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -61,7 +62,7 @@ export function CalendarView() {
         const data = await getCalendarAppointments(start, end, doctorId);
         setEvents(data as CalendarEvent[]);
       } catch (err) {
-        console.error("Failed to load events:", err);
+        // silent
       }
     },
     [selectedDoctor],
@@ -88,7 +89,7 @@ export function CalendarView() {
       );
     } catch (err) {
       info.revert();
-      console.error("Failed to move appointment:", err);
+      toast.error("Failed to move appointment");
     }
   };
 

@@ -13,6 +13,17 @@ import { PaymentFormDialog } from "@/components/billing/payment-form-dialog";
 import { PAYMENT_STATUS_COLORS } from "@/lib/constants";
 import { getInvoice, deleteInvoice } from "@/server/actions/billing";
 import { InvoiceFormDialog } from "@/components/billing/invoice-form-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 interface InvoiceData {
   id: string;
@@ -46,13 +57,14 @@ export default function InvoiceDetailPage() {
   const [loading, setLoading] = useState(true);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const loadInvoice = useCallback(async () => {
     try {
       const data = await getInvoice(id);
       setInvoice(data as unknown as InvoiceData);
     } catch (err) {
-      console.error("Failed to load invoice:", err);
+
     } finally {
       setLoading(false);
     }
@@ -63,12 +75,12 @@ export default function InvoiceDetailPage() {
   }, [loadInvoice]);
 
   const handleDelete = async () => {
-    if (!confirm("Delete this invoice? This cannot be undone.")) return;
     try {
       await deleteInvoice(id);
+      toast.success("Invoice deleted");
       router.push("/billing/invoices");
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to delete");
+      toast.error(err instanceof Error ? err.message : "Failed to delete");
     }
   };
 
@@ -128,7 +140,7 @@ export default function InvoiceDetailPage() {
             <Pencil className="h-4 w-4" />
             Edit
           </Button>
-          <Button variant="outline" onClick={handleDelete} className="gap-1.5 text-destructive">
+          <Button variant="outline" onClick={() => setDeleteOpen(true)} className="gap-1.5 text-destructive">
             <Trash2 className="h-4 w-4" />
             Delete
           </Button>
@@ -299,6 +311,23 @@ export default function InvoiceDetailPage() {
           )}
         </div>
       </div>
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Invoice</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this invoice? This action cannot be undone and all payment records will be removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <PaymentFormDialog
         open={paymentOpen}

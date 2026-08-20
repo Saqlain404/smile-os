@@ -1,12 +1,10 @@
 import { PrismaClient } from "../src/generated/prisma/client.js";
-import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaNeon } from "@prisma/adapter-neon";
 import { createId } from "@paralleldrive/cuid2";
 import { hashPassword } from "@better-auth/utils/password";
 import "dotenv/config";
 
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL!,
-});
+const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL! });
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
@@ -92,13 +90,16 @@ async function main() {
       email: "admin@smileos.com",
       emailVerified: true,
       role: "ADMIN",
-      accounts: {
-        create: [{
-          accountId: "admin@smileos.com",
-          providerId: "credential",
-          password: hashedPassword,
-        }],
-      },
+    },
+  });
+
+  await prisma.account.create({
+    data: {
+      accountId: adminUser.id,
+      providerId: "credential",
+      issuer: "local:credential",
+      password: hashedPassword,
+      userId: adminUser.id,
     },
   });
 
@@ -132,13 +133,16 @@ async function main() {
         email: d.email,
         emailVerified: true,
         role: "DENTIST",
-        accounts: {
-          create: [{
-            accountId: d.email,
-            providerId: "credential",
-            password: password,
-          }],
-        },
+      },
+    });
+
+    await prisma.account.create({
+      data: {
+        accountId: user.id,
+        providerId: "credential",
+        issuer: "local:credential",
+        password: password,
+        userId: user.id,
       },
     });
 
@@ -164,13 +168,16 @@ async function main() {
       email: "anna@smileos.com",
       emailVerified: true,
       role: "RECEPTIONIST",
-      accounts: {
-        create: [{
-          accountId: "anna@smileos.com",
-          providerId: "credential",
-          password: receptionistPassword,
-        }],
-      },
+    },
+  });
+
+  await prisma.account.create({
+    data: {
+      accountId: receptionistUser.id,
+      providerId: "credential",
+      issuer: "local:credential",
+      password: receptionistPassword,
+      userId: receptionistUser.id,
     },
   });
 

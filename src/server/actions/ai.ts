@@ -1,8 +1,10 @@
 "use server";
 
+import { requireSession } from "@/lib/auth-server";
 import { prisma } from "@/lib/prisma";
 
 export async function getAIInsights(clinicId?: string) {
+  await requireSession();
   const clinic = clinicId
     ? await prisma.clinic.findUnique({ where: { id: clinicId } })
     : await prisma.clinic.findFirst();
@@ -44,6 +46,7 @@ export async function getAIInsights(clinicId?: string) {
 }
 
 export async function generateInsights(clinicId?: string) {
+  await requireSession();
   const clinic = clinicId
     ? await prisma.clinic.findUnique({ where: { id: clinicId } })
     : await prisma.clinic.findFirst();
@@ -57,7 +60,7 @@ export async function generateInsights(clinicId?: string) {
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
   const [
-    totalPatients,
+    ,
     newPatients30d,
     totalAppointments,
     completedAppointments,
@@ -301,6 +304,7 @@ export async function generateInsights(clinicId?: string) {
 }
 
 export async function markInsightRead(id: string) {
+  await requireSession();
   return prisma.aIInsight.update({
     where: { id },
     data: { isRead: true },
@@ -308,6 +312,7 @@ export async function markInsightRead(id: string) {
 }
 
 export async function dismissInsight(id: string) {
+  await requireSession();
   return prisma.aIInsight.update({
     where: { id },
     data: { isDismissed: true },
@@ -315,6 +320,7 @@ export async function dismissInsight(id: string) {
 }
 
 export async function getAIDiagnosisSuggestions(patientId: string) {
+  await requireSession();
   const patient = await prisma.patient.findUnique({
     where: { id: patientId },
     include: {
@@ -466,6 +472,7 @@ export async function getAIDiagnosisSuggestions(patientId: string) {
 }
 
 export async function getAITreatmentPlan(patientId: string) {
+  await requireSession();
   const patient = await prisma.patient.findUnique({
     where: { id: patientId },
     include: {
@@ -623,6 +630,7 @@ export async function getAITreatmentPlan(patientId: string) {
 }
 
 export async function getAIScheduleOptimization(clinicId?: string) {
+  await requireSession();
   const clinic = clinicId
     ? await prisma.clinic.findUnique({ where: { id: clinicId } })
     : await prisma.clinic.findFirst();
@@ -751,12 +759,14 @@ export async function getAIScheduleOptimization(clinicId?: string) {
 }
 
 export async function createAIConversation(userId: string, title?: string) {
+  await requireSession();
   return prisma.aIConversation.create({
     data: { userId, title: title || "New Conversation" },
   });
 }
 
 export async function getAIConversations(userId: string) {
+  await requireSession();
   return prisma.aIConversation.findMany({
     where: { userId },
     include: { messages: { orderBy: { createdAt: "asc" }, take: 1 } },
@@ -765,6 +775,7 @@ export async function getAIConversations(userId: string) {
 }
 
 export async function getAIConversation(conversationId: string) {
+  await requireSession();
   return prisma.aIConversation.findUnique({
     where: { id: conversationId },
     include: { messages: { orderBy: { createdAt: "asc" } } },
@@ -775,6 +786,7 @@ export async function sendAIMessage(
   conversationId: string,
   content: string
 ) {
+  await requireSession();
   const userMessage = await prisma.aIMessage.create({
     data: {
       conversationId,
@@ -886,6 +898,7 @@ async function generateAIResponse(userMessage: string): Promise<string> {
 }
 
 export async function getAIGlobalStats(clinicId?: string) {
+  await requireSession();
   const clinic = clinicId
     ? await prisma.clinic.findUnique({ where: { id: clinicId } })
     : await prisma.clinic.findFirst();

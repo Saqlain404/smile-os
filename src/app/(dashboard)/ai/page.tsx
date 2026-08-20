@@ -53,7 +53,7 @@ export default function AIPage() {
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState<string>("overview");
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(
-    new Set(["diagnosis", "treatment", "schedule"])
+    new Set(["diagnosis", "treatment", "schedule"]),
   );
 
   useEffect(() => {
@@ -113,9 +113,10 @@ export default function AIPage() {
           value: `$${stats.revenue.pending.toLocaleString()}`,
           sub: `${stats.appointments.total} total appointments`,
           icon: AlertTriangle,
-          color: stats.revenue.pending > 0
-            ? "text-orange-600 bg-orange-50 dark:bg-orange-900/20"
-            : "text-green-600 bg-green-50 dark:bg-green-900/20",
+          color:
+            stats.revenue.pending > 0
+              ? "text-orange-600 bg-orange-50 dark:bg-orange-900/20"
+              : "text-green-600 bg-green-50 dark:bg-green-900/20",
         },
       ]
     : [];
@@ -152,9 +153,13 @@ export default function AIPage() {
                 <div>
                   <p className="text-sm text-muted-foreground">{card.label}</p>
                   <p className="text-2xl font-bold mt-1">{card.value}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{card.sub}</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {card.sub}
+                  </p>
                 </div>
-                <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${card.color}`}>
+                <div
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl ${card.color}`}
+                >
                   <card.icon className="h-5 w-5" />
                 </div>
               </div>
@@ -196,7 +201,7 @@ export default function AIPage() {
           className="space-y-6"
         >
           {/* Quick actions grid */}
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 items-stretch">
             <Link
               href="#diagnosis"
               onClick={() => {
@@ -208,17 +213,19 @@ export default function AIPage() {
                 });
               }}
             >
-              <div className="rounded-xl border bg-card p-5 hover:shadow-md transition-all cursor-pointer group">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500 text-white mb-3">
-                  <Brain className="h-6 w-6" />
+              <div className="h-full rounded-xl border bg-card p-5 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between">
+                <div>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500 text-white mb-3">
+                    <Brain className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-semibold group-hover:text-primary transition-colors">
+                    AI Diagnosis Assistant
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Clinical decision support based on patient history,
+                    allergies, and medical records.
+                  </p>
                 </div>
-                <h3 className="font-semibold group-hover:text-primary transition-colors">
-                  AI Diagnosis Assistant
-                </h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Clinical decision support based on patient history, allergies,
-                  and medical records.
-                </p>
               </div>
             </Link>
             <Link
@@ -232,17 +239,19 @@ export default function AIPage() {
                 });
               }}
             >
-              <div className="rounded-xl border bg-card p-5 hover:shadow-md transition-all cursor-pointer group">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500 text-white mb-3">
-                  <ClipboardList className="h-6 w-6" />
+              <div className="h-full rounded-xl border bg-card p-5 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between">
+                <div>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-500 text-white mb-3">
+                    <ClipboardList className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-semibold group-hover:text-primary transition-colors">
+                    Treatment Planning
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    AI-generated treatment plans with cost estimates, urgency
+                    levels, and phased recommendations.
+                  </p>
                 </div>
-                <h3 className="font-semibold group-hover:text-primary transition-colors">
-                  Treatment Planning
-                </h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  AI-generated treatment plans with cost estimates, urgency
-                  levels, and phased recommendations.
-                </p>
               </div>
             </Link>
             <Link
@@ -256,17 +265,19 @@ export default function AIPage() {
                 });
               }}
             >
-              <div className="rounded-xl border bg-card p-5 hover:shadow-md transition-all cursor-pointer group">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-500 text-white mb-3">
-                  <Calendar className="h-6 w-6" />
+              <div className="h-full rounded-xl border bg-card p-5 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between">
+                <div>
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-500 text-white mb-3">
+                    <Calendar className="h-6 w-6" />
+                  </div>
+                  <h3 className="font-semibold group-hover:text-primary transition-colors">
+                    Smart Scheduling
+                  </h3>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Optimize chair utilization, identify scheduling gaps, and
+                    balance doctor workloads.
+                  </p>
                 </div>
-                <h3 className="font-semibold group-hover:text-primary transition-colors">
-                  Smart Scheduling
-                </h3>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Optimize chair utilization, identify scheduling gaps, and
-                  balance doctor workloads.
-                </p>
               </div>
             </Link>
           </div>

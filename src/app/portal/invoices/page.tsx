@@ -25,8 +25,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { getPatientInvoices } from "@/server/actions/patient-portal";
 import { PAYMENT_STATUS_COLORS } from "@/lib/constants";
-
-const DEMO_USER_ID = "current-user";
+import { useSession } from "@/lib/auth-client";
 
 const container = {
   hidden: { opacity: 0 },
@@ -38,6 +37,9 @@ const item = {
 };
 
 export default function PatientInvoicesPage() {
+  const { data: session } = useSession();
+  const userId = session?.user?.id ?? "";
+
   const [invoices, setInvoices] = useState<Array<Record<string, unknown>>>([]);
   const [pagination, setPagination] = useState({ page: 1, pageSize: 10, total: 0, totalPages: 0 });
   const [statusFilter, setStatusFilter] = useState<string>("all");
@@ -47,7 +49,7 @@ export default function PatientInvoicesPage() {
   const fetchData = useCallback(async (page = 1) => {
     setLoading(true);
     try {
-      const data = await getPatientInvoices(DEMO_USER_ID, {
+      const data = await getPatientInvoices(userId, {
         status: statusFilter === "all" ? undefined : statusFilter,
         page,
         pageSize: 10,
@@ -59,11 +61,12 @@ export default function PatientInvoicesPage() {
     } finally {
       setLoading(false);
     }
-  }, [statusFilter]);
+  }, [userId, statusFilter]);
 
   useEffect(() => {
+    if (!userId) return;
     fetchData(1);
-  }, [fetchData]);
+  }, [userId, fetchData]);
 
   return (
     <motion.div

@@ -94,7 +94,6 @@ export function InvoiceFormDialog({
         setPatients(patientResult.data as Patient[]);
         setTreatments((treatmentResult as unknown as Treatment[]).map((t) => ({ ...t, price: Number(t.price) })));
       } catch (err) {
-        console.error("Failed to load form data:", err);
       }
     }
     if (open) loadData();

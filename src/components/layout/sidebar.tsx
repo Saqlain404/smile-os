@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -90,6 +90,7 @@ const navGroups: NavGroup[] = [
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
 
   return (
@@ -218,7 +219,7 @@ export function Sidebar() {
                 "w-full justify-start gap-3 text-muted-foreground hover:text-destructive",
                 collapsed && "justify-center px-0"
               )}
-              onClick={() => signOut()}
+              onClick={() => signOut({ fetchOptions: { onSuccess: () => router.push("/login") } })}
             >
               <LogOut className="h-4 w-4" />
               {!collapsed && <span>Sign Out</span>}

@@ -21,6 +21,17 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { getStaffMember, deleteStaff } from "@/server/actions/staff";
 import { StaffFormDialog } from "@/components/staff/staff-form-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -71,13 +82,13 @@ export default function StaffDetailPage() {
   const [staff, setStaff] = useState<StaffData | null>(null);
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const loadStaff = useCallback(async () => {
     try {
       const data = await getStaffMember(id);
       setStaff(data as unknown as StaffData);
-    } catch (err) {
-      console.error("Failed to load staff:", err);
+    } catch {
     } finally {
       setLoading(false);
     }
@@ -88,12 +99,12 @@ export default function StaffDetailPage() {
   }, [loadStaff]);
 
   const handleDelete = async () => {
-    if (!confirm("Deactivate this staff member?")) return;
     try {
       await deleteStaff(id);
+      toast.success("Staff member deactivated");
       router.push("/staff");
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Failed to deactivate");
+      toast.error(err instanceof Error ? err.message : "Failed to deactivate");
     }
   };
 
@@ -152,7 +163,7 @@ export default function StaffDetailPage() {
             <Pencil className="h-4 w-4" />
             Edit
           </Button>
-          <Button variant="outline" onClick={handleDelete} className="gap-1.5 text-destructive">
+          <Button variant="outline" onClick={() => setDeleteOpen(true)} className="gap-1.5 text-destructive">
             <Trash2 className="h-4 w-4" />
             Deactivate
           </Button>
@@ -337,6 +348,23 @@ export default function StaffDetailPage() {
           </Card>
         </div>
       </div>
+
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Deactivate Staff Member</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to deactivate this staff member? They will no longer be able to log in or be assigned to appointments.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Deactivate
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <StaffFormDialog
         open={editOpen}

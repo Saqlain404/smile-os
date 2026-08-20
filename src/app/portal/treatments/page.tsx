@@ -9,8 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { getPatientTreatments } from "@/server/actions/patient-portal";
-
-const DEMO_USER_ID = "current-user";
+import { useSession } from "@/lib/auth-client";
 
 interface PrescriptionItem {
   id: string;
@@ -56,11 +55,15 @@ export default function PatientTreatmentsPage() {
     prescriptions: Prescription[];
   }>({ consultations: [], prescriptions: [] });
   const [loading, setLoading] = useState(true);
+  const { data: session } = useSession();
+  const userId = session?.user?.id ?? "";
 
   useEffect(() => {
+    if (!userId) return;
+
     async function load() {
       try {
-        const result = await getPatientTreatments(DEMO_USER_ID);
+        const result = await getPatientTreatments(userId);
         setData(result as unknown as { consultations: Consultation[]; prescriptions: Prescription[] });
       } catch {
         // empty
@@ -69,7 +72,7 @@ export default function PatientTreatmentsPage() {
       }
     }
     load();
-  }, []);
+  }, [userId]);
 
   return (
     <motion.div

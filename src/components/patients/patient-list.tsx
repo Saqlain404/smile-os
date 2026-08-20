@@ -66,7 +66,6 @@ export function PatientList() {
       setPatients(result.data as PatientRow[]);
       setPagination(result.pagination);
     } catch (error) {
-      console.error("Failed to fetch patients:", error);
     } finally {
       setLoading(false);
     }

@@ -17,8 +17,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { getPatientAppointments } from "@/server/actions/patient-portal";
 import { APPOINTMENT_STATUS_COLORS } from "@/lib/constants";
-
-const DEMO_USER_ID = "current-user";
+import { useSession } from "@/lib/auth-client";
 
 interface Appointment {
   id: string;
@@ -46,15 +45,19 @@ const item = {
 };
 
 export default function PatientAppointmentsPage() {
+  const { data: session } = useSession();
+  const userId = session?.user?.id ?? "";
+
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [pagination, setPagination] = useState({ page: 1, pageSize: 10, total: 0, totalPages: 0 });
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [loading, setLoading] = useState(true);
 
   const fetchData = useCallback(async (page = 1) => {
+    if (!userId) return;
     setLoading(true);
     try {
-      const data = await getPatientAppointments(DEMO_USER_ID, {
+      const data = await getPatientAppointments(userId, {
         status: statusFilter === "all" ? undefined : statusFilter,
         page,
         pageSize: 10,
@@ -66,11 +69,11 @@ export default function PatientAppointmentsPage() {
     } finally {
       setLoading(false);
     }
-  }, [statusFilter]);
+  }, [statusFilter, userId]);
 
   useEffect(() => {
-    fetchData(1);
-  }, [fetchData]);
+    if (userId) fetchData(1);
+  }, [fetchData, userId]);
 
   return (
     <motion.div

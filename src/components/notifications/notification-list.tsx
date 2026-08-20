@@ -34,6 +34,7 @@ import {
   NOTIFICATION_STATUS_COLORS,
 } from "@/lib/constants";
 import { formatDistanceToNow } from "date-fns";
+import { useSession } from "@/lib/auth-client";
 
 interface NotificationItem {
   id: string;
@@ -73,6 +74,9 @@ export function NotificationList({
   onFilterChange,
   filters,
 }: NotificationListProps) {
+  const { data: session } = useSession();
+  const userId = session?.user?.id ?? "";
+
   const [notifications, setNotifications] = useState(initialNotifications);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
@@ -84,7 +88,7 @@ export function NotificationList({
   };
 
   const handleMarkAllRead = async () => {
-    await markAllAsRead("current-user");
+    await markAllAsRead(userId);
     setNotifications((prev) =>
       prev.map((n) => ({ ...n, status: "READ" }))
     );

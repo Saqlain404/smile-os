@@ -21,8 +21,7 @@ import {
   getPatientStats,
 } from "@/server/actions/patient-portal";
 import { APPOINTMENT_STATUS_COLORS } from "@/lib/constants";
-
-const DEMO_USER_ID = "current-user";
+import { useSession } from "@/lib/auth-client";
 
 interface PortalAppointment {
   id: string;
@@ -65,6 +64,9 @@ const item = {
 };
 
 export default function PatientPortalDashboard() {
+  const { data: session } = useSession();
+  const userId = session?.user?.id ?? "";
+
   const [patient, setPatient] = useState<PortalPatient | null>(null);
   const [appointments, setAppointments] = useState<PortalAppointment[]>([]);
   const [stats, setStats] = useState({
@@ -77,12 +79,14 @@ export default function PatientPortalDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!userId) return;
+
     async function load() {
       try {
         const [patientData, apptData, statsData] = await Promise.all([
-          getPatientByUserId(DEMO_USER_ID),
-          getPatientAppointments(DEMO_USER_ID, { pageSize: 5 }),
-          getPatientStats(DEMO_USER_ID),
+          getPatientByUserId(userId),
+          getPatientAppointments(userId, { pageSize: 5 }),
+          getPatientStats(userId),
         ]);
         if (patientData) setPatient(patientData as unknown as PortalPatient);
         setAppointments(apptData.data as unknown as PortalAppointment[]);
@@ -94,7 +98,7 @@ export default function PatientPortalDashboard() {
       }
     }
     load();
-  }, []);
+  }, [userId]);
 
   const statCards = [
     {

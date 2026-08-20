@@ -13,6 +13,7 @@ import {
   getNotificationStats,
   markAllAsRead,
 } from "@/server/actions/notifications";
+import { useSession } from "@/lib/auth-client";
 
 const container = {
   hidden: { opacity: 0 },
@@ -23,9 +24,9 @@ const item = {
   show: { opacity: 1, y: 0 },
 };
 
-const DEMO_USER_ID = "current-user";
-
 export default function NotificationsPage() {
+  const { data: session } = useSession();
+  const userId = session?.user?.id ?? "";
   const [notifications, setNotifications] = useState<
     { id: string; title: string; message: string; type: string; status: string; link: string | null; createdAt: Date }[]
   >([]);
@@ -44,12 +45,12 @@ export default function NotificationsPage() {
     try {
       const [notifs, notifStats] = await Promise.all([
         getNotifications({
-          userId: DEMO_USER_ID,
+          userId,
           page,
           pageSize: 20,
           ...filters,
         }),
-        getNotificationStats(DEMO_USER_ID),
+        getNotificationStats(userId),
       ]);
       setNotifications(notifs.data as typeof notifications);
       setPagination(notifs.pagination);
@@ -59,11 +60,12 @@ export default function NotificationsPage() {
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [userId, filters]);
 
   useEffect(() => {
+    if (!userId) return;
     fetchData(1);
-  }, [fetchData]);
+  }, [userId, fetchData]);
 
   const handlePageChange = (page: number) => {
     fetchData(page);
@@ -74,7 +76,7 @@ export default function NotificationsPage() {
   };
 
   const handleMarkAllRead = async () => {
-    await markAllAsRead(DEMO_USER_ID);
+    await markAllAsRead(userId);
     fetchData(pagination.page);
   };
 

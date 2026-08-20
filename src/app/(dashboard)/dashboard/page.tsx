@@ -204,7 +204,7 @@ export default function DashboardPage() {
                       tick={{ fontSize: 12, fill: "var(--color-muted-foreground)" }}
                       axisLine={false}
                       tickLine={false}
-                      tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                      tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
                     />
                     <Tooltip
                       contentStyle={{
@@ -213,7 +213,8 @@ export default function DashboardPage() {
                         borderRadius: "8px",
                         fontSize: "12px",
                       }}
-                      formatter={(value) => [`$${Number(value).toLocaleString()}`, "Revenue"]}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      formatter={(value: any) => [`$${Number(value ?? 0).toLocaleString()}`, "Revenue"]}
                     />
                     <Area
                       type="monotone"
